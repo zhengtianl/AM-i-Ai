@@ -1,6 +1,12 @@
-from flask import Flask
+from flask import Flask, send_file
+from gtts import gTTS
+import os
 
 app = Flask(__name__)
+
+def text_to_audio(text, output_filename):
+    tts = gTTS(text=text, lang='en')  # 可以根据需要调整语言
+    tts.save(output_filename)
 
 def read_text_file(file_path):
     try:
@@ -11,8 +17,10 @@ def read_text_file(file_path):
 
 @app.route('/')
 def send_file_content():
-    file_content = read_text_file('text.txt')
-    return file_content
+    text = read_text_file('text.txt')
+    audio_filename = "output.wav"
+    text_to_audio(text, audio_filename)
+    return send_file(audio_filename, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(port=80)
